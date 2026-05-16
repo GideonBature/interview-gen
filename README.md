@@ -38,7 +38,7 @@ Hardcoding an API key in a public repository is a security risk. Embedding it in
 
 ### Why structured JSON output?
 
-The prompt instructs the model to return a strict JSON array with typed question objects. This makes the response easy to parse and render consistently, and gives each question a visible label in the UI (Behavioral / Situational / Competency). It also makes the output predictable — easier to test, easier to extend.
+The prompt instructs the model to return a strict JSON array with typed question objects, and the API request also sets `responseMimeType: "application/json"` with a response schema. This makes the response easier to parse and render consistently, and gives each question a visible label in the UI (Behavioral / Situational / Competency). The app still validates the parsed response before rendering so malformed or incomplete responses fail clearly instead of breaking the page.
 
 ---
 
