@@ -341,12 +341,12 @@
       <div id="questions-list"></div>
     </div>
 
-    <footer>Powered by Gemma 4 31B &nbsp;&middot;&nbsp; Google AI</footer>
+    <footer>Powered by Gemini 3.1 Flash Lite &nbsp;&middot;&nbsp; Google AI</footer>
 
   </div>
 
   <script>
-    var MODEL_NAME    = "gemma-4-31b-it";
+    var MODEL_NAME    = "gemini-3.1-flash-lite";
     var GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/" + MODEL_NAME + ":generateContent";
 
     var SYSTEM_PROMPT = "You are an expert hiring manager and talent acquisition specialist with 15+ years of experience conducting interviews across industries.\n\nWhen given a job title, generate exactly 3 thoughtful, role-specific interview questions. Follow these rules:\n- Question 1 must be BEHAVIORAL (past experience — starts with \"Tell me about a time...\" or similar)\n- Question 2 must be SITUATIONAL (hypothetical scenario — starts with \"Imagine you...\" or \"How would you handle...\")\n- Question 3 must be COMPETENCY-BASED (tests a core skill directly relevant to the role)\n\nEach question must:\n- Be specific to the actual responsibilities and challenges of that role\n- Reveal something meaningful about the candidate's suitability\n- Avoid generic questions like \"tell me about yourself\" or \"where do you see yourself in 5 years\"\n\nReturn ONLY a valid JSON array in this exact format, no markdown fences, no extra text:\n[\n  { \"type\": \"Behavioral\", \"question\": \"...\" },\n  { \"type\": \"Situational\", \"question\": \"...\" },\n  { \"type\": \"Competency\", \"question\": \"...\" }\n]";
