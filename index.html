@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interview Question Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d0f0e;
+      --surface:   #141714;
+      --border:    #252825;
+      --accent:    #b8f55a;
+      --accent-dim:#7aaa2e;
+      --text:      #e8ece6;
+      --muted:     #6b7268;
+      --error:     #ff6b6b;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 60px 20px 80px;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 680px;
+    }
+
+    header { margin-bottom: 56px; }
+
+    .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      line-height: 1.1;
+      color: var(--text);
+      font-weight: 400;
+    }
+
+    h1 em { font-style: italic; color: var(--accent); }
+
+    .subtitle {
+      margin-top: 14px;
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .form-group { margin-bottom: 16px; }
+
+    label {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      padding: 16px 20px;
+      border-radius: 4px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input::placeholder { color: var(--muted); }
+    input:focus { border-color: var(--accent); }
+
+    .api-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      margin-bottom: 8px;
+    }
+
+    .api-row .form-group { flex: 1; margin-bottom: 0; }
+
+    .toggle-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      padding: 16px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.2s, border-color 0.2s;
+      letter-spacing: 0.08em;
+    }
+
+    .toggle-btn:hover { color: var(--text); border-color: var(--muted); }
+
+    .api-hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 20px;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.03em;
+    }
+
+    .api-hint a { color: var(--accent-dim); text-decoration: none; }
+    .api-hint a:hover { color: var(--accent); }
+
+    button[type="submit"] {
+      width: 100%;
+      background: var(--accent);
+      color: #0d0f0e;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border: none;
+      padding: 18px 32px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 8px;
+    }
+
+    button[type="submit"]:hover:not(:disabled) { background: #c9ff66; }
+    button[type="submit"]:active:not(:disabled) { transform: scale(0.99); }
+    button[type="submit"]:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+    .loader {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      padding: 32px 0 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.08em;
+    }
+
+    .loader.visible { display: flex; }
+
+    .dots { display: flex; gap: 5px; }
+
+    .dots span {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    .dots span:nth-child(2) { animation-delay: 0.2s; }
+    .dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes pulse {
+      0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+      40%            { opacity: 1;   transform: scale(1); }
+    }
+
+    .results { margin-top: 40px; display: none; }
+    .results.visible { display: block; }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .results-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .role-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    .question-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 4px;
+      padding: 24px 24px 24px 28px;
+      margin-bottom: 14px;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: slideIn 0.4s ease forwards;
+    }
+
+    .question-card:nth-child(2) { animation-delay: 0.1s; }
+    .question-card:nth-child(3) { animation-delay: 0.2s; }
+
+    @keyframes slideIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .q-number {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent-dim);
+      margin-bottom: 10px;
+    }
+
+    .q-type {
+      display: inline-block;
+      background: rgba(184,245,90,0.08);
+      color: var(--accent);
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 2px;
+      margin-bottom: 12px;
+    }
+
+    .q-text {
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--text);
+      font-weight: 300;
+    }
+
+    .error-box {
+      display: none;
+      background: rgba(255,107,107,0.08);
+      border: 1px solid rgba(255,107,107,0.3);
+      border-radius: 4px;
+      padding: 16px 20px;
+      margin-top: 20px;
+      color: var(--error);
+      font-size: 13px;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.04em;
+      line-height: 1.6;
+    }
+
+    .error-box.visible { display: block; }
+
+    footer {
+      margin-top: 64px;
+      text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--border);
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+
+    <header>
+      <p class="eyebrow">AI-Powered</p>
+      <h1>Interview <em>Question</em><br>Generator</h1>
+      <p class="subtitle">Enter a job title and get 3 thoughtful, role-specific interview questions — behavioral, situational, and competency-based.</p>
+    </header>
+
+    <div class="api-row">
+      <div class="form-group">
+        <label for="api-key">Google Gemini API Key</label>
+        <input type="password" id="api-key" placeholder="AIza..." autocomplete="off" spellcheck="false" />
+      </div>
+      <button type="button" class="toggle-btn" id="toggle-key">Show</button>
+    </div>
+    <p class="api-hint">
+      Get a free key at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a> — no credit card required.
+    </p>
+
+    <div class="form-group">
+      <label for="job-title">Job Title</label>
+      <input type="text" id="job-title" placeholder="e.g. Customer Success Manager" maxlength="100" />
+    </div>
+
+    <button type="submit" id="submit-btn">Generate Questions</button>
+
+    <div class="loader" id="loader">
+      <div class="dots"><span></span><span></span><span></span></div>
+      Generating questions...
+    </div>
+
+    <div class="error-box" id="error-box"></div>
+
+    <div class="results" id="results">
+      <div class="results-header">
+        <span class="results-label">Interview Questions</span>
+        <span class="role-tag" id="role-tag"></span>
+      </div>
+      <div id="questions-list"></div>
+    </div>
+
+    <footer>Powered by Gemini 2.5 Flash &nbsp;&middot;&nbsp; Google AI</footer>
+
+  </div>
+
+  <script>
+    var MODEL_NAME    = "gemini-2.5-flash-preview-05-20";
+    var GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/" + MODEL_NAME + ":generateContent";
+
+    var SYSTEM_PROMPT = "You are an expert hiring manager and talent acquisition specialist with 15+ years of experience conducting interviews across industries.\n\nWhen given a job title, generate exactly 3 thoughtful, role-specific interview questions. Follow these rules:\n- Question 1 must be BEHAVIORAL (past experience — starts with \"Tell me about a time...\" or similar)\n- Question 2 must be SITUATIONAL (hypothetical scenario — starts with \"Imagine you...\" or \"How would you handle...\")\n- Question 3 must be COMPETENCY-BASED (tests a core skill directly relevant to the role)\n\nEach question must:\n- Be specific to the actual responsibilities and challenges of that role\n- Reveal something meaningful about the candidate's suitability\n- Avoid generic questions like \"tell me about yourself\" or \"where do you see yourself in 5 years\"\n\nReturn ONLY a valid JSON array in this exact format, no markdown fences, no extra text:\n[\n  { \"type\": \"Behavioral\", \"question\": \"...\" },\n  { \"type\": \"Situational\", \"question\": \"...\" },\n  { \"type\": \"Competency\", \"question\": \"...\" }\n]";
+
+    var apiKeyInput   = document.getElementById("api-key");
+    var toggleKeyBtn  = document.getElementById("toggle-key");
+    var jobTitleInput = document.getElementById("job-title");
+    var submitBtn     = document.getElementById("submit-btn");
+    var loader        = document.getElementById("loader");
+    var errorBox      = document.getElementById("error-box");
+    var results       = document.getElementById("results");
+    var roleTag       = document.getElementById("role-tag");
+    var questionsList = document.getElementById("questions-list");
+
+    // Show / hide API key
+    toggleKeyBtn.addEventListener("click", function () {
+      if (apiKeyInput.type === "password") {
+        apiKeyInput.type = "text";
+        toggleKeyBtn.textContent = "Hide";
+      } else {
+        apiKeyInput.type = "password";
+        toggleKeyBtn.textContent = "Show";
+      }
+    });
+
+    // Trigger on button click or Enter key
+    submitBtn.addEventListener("click", handleSubmit);
+    jobTitleInput.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") handleSubmit();
+    });
+
+    function handleSubmit() {
+      var apiKey   = apiKeyInput.value.trim();
+      var jobTitle = jobTitleInput.value.trim();
+
+      if (!apiKey)   { showError("Please enter your Gemini API key.");  return; }
+      if (!jobTitle) { showError("Please enter a job title.");          return; }
+
+      clearState();
+      setLoading(true);
+
+      fetchQuestions(apiKey, jobTitle)
+        .then(function (questions) {
+          renderQuestions(questions, jobTitle);
+        })
+        .catch(function (err) {
+          showError(err.message || "Something went wrong. Please try again.");
+        })
+        .finally(function () {
+          setLoading(false);
+        });
+    }
+
+    function fetchQuestions(apiKey, jobTitle) {
+      var url = GEMINI_API_URL + "?key=" + encodeURIComponent(apiKey);
+
+      var body = {
+        system_instruction: {
+          parts: [{ text: SYSTEM_PROMPT }]
+        },
+        contents: [{
+          role: "user",
+          parts: [{ text: "Generate 3 interview questions for the role: " + jobTitle }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 1024
+        }
+      };
+
+      return fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      })
+      .then(function (response) {
+        return response.json().then(function (data) {
+          if (!response.ok) {
+            var msg = (data.error && data.error.message) || ("API error (" + response.status + ")");
+            throw new Error(msg);
+          }
+          return data;
+        });
+      })
+      .then(function (data) {
+        var rawText = data.candidates[0].content.parts[0].text;
+        var clean   = rawText.replace(/```json|```/g, "").trim();
+        var parsed  = JSON.parse(clean);
+
+        if (!Array.isArray(parsed) || parsed.length !== 3) {
+          throw new Error("Unexpected response format from model.");
+        }
+        return parsed;
+      });
+    }
+
+    function renderQuestions(questions, jobTitle) {
+      roleTag.textContent  = jobTitle;
+      questionsList.innerHTML = "";
+
+      questions.forEach(function (q, i) {
+        var card = document.createElement("div");
+        card.className = "question-card";
+        card.innerHTML =
+          '<div class="q-number">Question ' + (i + 1) + '</div>' +
+          '<span class="q-type">' + escapeHTML(q.type) + '</span>' +
+          '<p class="q-text">' + escapeHTML(q.question) + '</p>';
+        questionsList.appendChild(card);
+      });
+
+      results.classList.add("visible");
+    }
+
+    function setLoading(isLoading) {
+      submitBtn.disabled    = isLoading;
+      submitBtn.textContent = isLoading ? "Generating..." : "Generate Questions";
+      if (isLoading) {
+        loader.classList.add("visible");
+      } else {
+        loader.classList.remove("visible");
+      }
+    }
+
+    function showError(message) {
+      errorBox.textContent = message;
+      errorBox.classList.add("visible");
+    }
+
+    function clearState() {
+      errorBox.classList.remove("visible");
+      results.classList.remove("visible");
+      questionsList.innerHTML = "";
+    }
+
+    function escapeHTML(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>
