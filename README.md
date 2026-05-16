@@ -28,9 +28,9 @@ The assignment called for a simple, hosted, interactive page. A single `index.ht
 
 Most AI APIs — including OpenAI, Anthropic, and DeepSeek — block direct browser requests due to CORS policy. Gemini's REST API accepts the key as a URL query parameter, which sidesteps the CORS preflight check and makes it the correct choice for a purely client-side static app. Using a backend proxy would have added infrastructure complexity with no meaningful benefit for this use case.
 
-### Why Gemini 2.5 Flash specifically?
+### Why Gemma 4 31B specifically?
 
-It is fast, capable, and available on the free tier with no credit card required. The app uses the stable Gemini API model code `gemini-2.5-flash` rather than a dated preview model. For generating structured interview questions, it produces output that is indistinguishable from larger, more expensive models.
+It is capable, available through the Gemini API, and offers a much larger free-tier request allowance for this project than Gemini 2.5 Flash. The app uses the Gemma model code `gemma-4-31b-it`. For generating structured interview questions, it provides enough quality while keeping the static demo practical to test without quickly exhausting daily quota.
 
 ### Why does the user enter their own API key?
 
