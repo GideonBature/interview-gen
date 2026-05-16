@@ -30,7 +30,7 @@ Most AI APIs — including OpenAI, Anthropic, and DeepSeek — block direct brow
 
 ### Why Gemini 2.5 Flash specifically?
 
-It is fast, capable, and available on the free tier with no credit card required. For generating structured interview questions, it produces output that is indistinguishable from larger, more expensive models.
+It is fast, capable, and available on the free tier with no credit card required. The app uses the stable Gemini API model code `gemini-2.5-flash` rather than a dated preview model. For generating structured interview questions, it produces output that is indistinguishable from larger, more expensive models.
 
 ### Why does the user enter their own API key?
 
